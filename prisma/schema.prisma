@@ -16,6 +16,7 @@ datasource db {
 model User {
   id        Int      @id @default(autoincrement())
   username  String   @unique @db.VarChar(255)
+  email     String
   password  String   @db.VarChar(255)
   role      String   @default("user") // Role can be "user" or "admin"
   createdAt DateTime @default(now())
