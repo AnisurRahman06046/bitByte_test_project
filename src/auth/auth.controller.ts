@@ -1,12 +1,15 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/users/dtos/create-user.dto';
+import { Public } from './public.route';
 
+@Public()
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   //   create a user
+
   @Post('register')
   async createUser(@Body() payload: CreateUserDto) {
     const result = await this.authService.createUser(payload);

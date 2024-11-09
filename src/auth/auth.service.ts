@@ -74,10 +74,7 @@ export class AuthService {
     // generate access token
     const jwtPayload = { id: user.id, email: user.email, role: user.role };
 
-    const accessToken = await this.jwtService.signAsync(jwtPayload, {
-      expiresIn: process.env.JWT_EXPIRES_IN,
-      secret: process.env.JWT_SECRET,
-    });
+    const accessToken = await this.jwtService.signAsync(jwtPayload);
     return {
       accessToken: accessToken,
     };
