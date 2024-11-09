@@ -15,4 +15,13 @@ export class AuthController {
       data: result,
     };
   }
+
+  @Post('login')
+  async login(@Body() payload: { email: string; password: string }) {
+    const result = await this.authService.login(payload);
+    return {
+      message: 'User is logged in',
+      data: result,
+    };
+  }
 }
