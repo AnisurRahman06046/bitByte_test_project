@@ -1,4 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
@@ -16,7 +22,8 @@ export class ProductsService {
   }
 
   //   get all products
-  async fetchProducts(query: any) {
+
+  async fetchProducts(query?: any) {
     const {
       page = 1,
       limit = 10,
@@ -26,17 +33,25 @@ export class ProductsService {
     } = query;
 
     const skip = (page - 1) * limit;
-    const orderBy = [];
+    const orderBy: any[] = [];
 
+    // Prepare dynamic filter for category
+    const where: any = { status: 1 };
+
+    // Filter by category if provided
+    if (category) {
+      where.category = category;
+    }
+
+    // Handle sorting by price or createdAt
     if (sortByPrice) {
-      orderBy.push({ price: sortByPrice });
+      orderBy.push({ price: sortByPrice === 'asc' ? 'asc' : 'desc' });
     }
     if (sortByCreatedAt) {
-      orderBy.push({ createdAt: sortByCreatedAt });
+      orderBy.push({ createdAt: sortByCreatedAt === 'asc' ? 'asc' : 'desc' });
     }
 
-    const where = category ? { category } : {};
-
+    // Fetch products with dynamic filters
     const products = await this.prisma.product.findMany({
       where,
       skip,
@@ -44,7 +59,14 @@ export class ProductsService {
       orderBy,
     });
 
-    const total = await this.prisma.product.count({ where });
+    // Calculate total products matching the filter
+    const total = await this.prisma.product.count({
+      where,
+    });
+
+    if (products.length === 0) {
+      throw new HttpException('No products found', HttpStatus.NOT_FOUND);
+    }
 
     return {
       data: products,
@@ -62,6 +84,7 @@ export class ProductsService {
     const product = await this.prisma.product.findUnique({
       where: {
         id: id,
+        status: 1,
       },
     });
     if (!product) {
@@ -71,18 +94,18 @@ export class ProductsService {
   }
 
   //   update a product
-  async updateProduct(id: number, payload: UpdateProductDto) {
+  async updateProduct(payload: UpdateProductDto) {
     const product = await this.prisma.product.findUnique({
-      where: { id: id },
+      where: { id: payload.id },
     });
 
     if (!product) {
       throw new NotFoundException('Product does not exist');
     }
-
+    const { id, ...data } = payload;
     const updatedProduct = await this.prisma.product.update({
       where: { id: id },
-      data: payload,
+      data: data,
     });
 
     return updatedProduct;
@@ -90,17 +113,27 @@ export class ProductsService {
 
   //   delete a product
   async deleteProduct(id: number) {
+    // Find the product by ID
     const product = await this.prisma.product.findUnique({
-      where: { id: id, status: -1 },
+      where: { id: id },
     });
 
+    // If the product doesn't exist, throw a NotFoundException
     if (!product) {
       throw new NotFoundException('Product does not exist');
     }
+
+    // If the product is already deleted, throw a BadRequestException
+    if (product.status === -1) {
+      throw new BadRequestException('Product is already deleted');
+    }
+
+    // Update the product's status to -1 (mark as deleted)
     const result = await this.prisma.product.update({
       where: { id: id },
       data: { status: -1 },
     });
+
     return result;
   }
 }

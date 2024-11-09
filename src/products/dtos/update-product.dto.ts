@@ -1,6 +1,15 @@
-import { IsOptional, IsString, IsNumber } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsNumber,
+  IsInt,
+  IsNotEmpty,
+} from 'class-validator';
 
 export class UpdateProductDto {
+  @IsInt()
+  @IsNotEmpty()
+  id: number;
   @IsOptional()
   @IsString()
   name?: string;
