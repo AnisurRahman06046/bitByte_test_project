@@ -40,6 +40,7 @@ export class ProductsController {
     @Query('category') category?: string,
     @Query('sortByPrice') sortByPrice?: 'asc' | 'desc',
     @Query('sortByCreatedAt') sortByCreatedAt?: 'asc' | 'desc',
+    @Query('search') search?: string,
   ) {
     // Ensure page and limit are integers
     const pageInt = parseInt(page.toString(), 10);
@@ -51,6 +52,7 @@ export class ProductsController {
       category,
       sortByPrice,
       sortByCreatedAt,
+      search,
     });
     return {
       message: 'All products are fetched',

@@ -23,26 +23,90 @@ export class ProductsService {
 
   //   get all products
 
-  async fetchProducts(query?: any) {
+//   async fetchProducts(query?: any) {
+//     const {
+//       page = 1,
+//       limit = 10,
+//       category,
+//       sortByPrice,
+//       sortByCreatedAt,
+//     } = query;
+
+//     const skip = (page - 1) * limit;
+//     const orderBy: any[] = [];
+
+//     // Prepare dynamic filter for category
+//     const where: any = { status: 1 };
+
+//     // Filter by category if provided
+//     if (category) {
+//       where.category = category;
+//     }
+
+//     // Handle sorting by price or createdAt
+//     if (sortByPrice) {
+//       orderBy.push({ price: sortByPrice === 'asc' ? 'asc' : 'desc' });
+//     }
+//     if (sortByCreatedAt) {
+//       orderBy.push({ createdAt: sortByCreatedAt === 'asc' ? 'asc' : 'desc' });
+//     }
+
+//     // Fetch products with dynamic filters
+//     const products = await this.prisma.product.findMany({
+//       where,
+//       skip,
+//       take: limit,
+//       orderBy,
+//     });
+
+//     // Calculate total products matching the filter
+//     const total = await this.prisma.product.count({
+//       where,
+//     });
+
+//     if (products.length === 0) {
+//       throw new HttpException('No products found', HttpStatus.NOT_FOUND);
+//     }
+
+//     return {
+//       data: products,
+//       pagination: {
+//         total,
+//         page,
+//         limit,
+//         totalPages: Math.ceil(total / limit),
+//       },
+//     };
+//   }
+async fetchProducts(query?: any) {
     const {
       page = 1,
       limit = 10,
       category,
       sortByPrice,
       sortByCreatedAt,
+      search, // Add the search parameter
     } = query;
-
+  
     const skip = (page - 1) * limit;
     const orderBy: any[] = [];
-
+    
     // Prepare dynamic filter for category
     const where: any = { status: 1 };
-
+  
     // Filter by category if provided
     if (category) {
       where.category = category;
     }
-
+  
+    // Add full-text search filter if search query is provided
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: 'insensitive' } }, // Search in the name field
+        { description: { contains: search, mode: 'insensitive' } }, // Search in the description field
+      ];
+    }
+  
     // Handle sorting by price or createdAt
     if (sortByPrice) {
       orderBy.push({ price: sortByPrice === 'asc' ? 'asc' : 'desc' });
@@ -50,7 +114,7 @@ export class ProductsService {
     if (sortByCreatedAt) {
       orderBy.push({ createdAt: sortByCreatedAt === 'asc' ? 'asc' : 'desc' });
     }
-
+  
     // Fetch products with dynamic filters
     const products = await this.prisma.product.findMany({
       where,
@@ -58,16 +122,16 @@ export class ProductsService {
       take: limit,
       orderBy,
     });
-
+  
     // Calculate total products matching the filter
     const total = await this.prisma.product.count({
       where,
     });
-
+  
     if (products.length === 0) {
       throw new HttpException('No products found', HttpStatus.NOT_FOUND);
     }
-
+  
     return {
       data: products,
       pagination: {
@@ -78,7 +142,8 @@ export class ProductsService {
       },
     };
   }
-
+  
+  
   //   get single product
   async fetchProduct(id: number) {
     const product = await this.prisma.product.findUnique({
