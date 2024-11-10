@@ -50,6 +50,15 @@ npm run start:dev
 
 ### Recommendation: 
 Run the project from your local machine by completing the initial setup cause on Render it takes time to load api.
+
+### Findings
+- Need to implement caching. 
+- Need to implement unit testing. 
+
+### Learning curve:
+- Exploring redis for caching.
+- Exploring unit testing specially in nestjs.
+
 ### Deployment:
 - **Backend**: Render
 
