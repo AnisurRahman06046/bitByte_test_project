@@ -31,6 +31,8 @@ https://bitbyte-test-project.onrender.com/api
 - **Bcrypt**: For password hashing.
 - **Neon**: For database hosting.
 
+## Architecture : 
+Since this project is not complex, focused on nestjs proficiency and basic crud operations that's why ***Monolith*** architecture has been used here.
 
 ## Clone the repository:
 ```bash
@@ -47,6 +49,12 @@ npm install
 ```bash
 npm run start:dev
 ```
+## Api endpoints:
+- POST/products : create new product ( only admin )
+- GET/products : fetch all products list ( public )
+- GET/products/{id} : fetch single product
+- PATCH/products : update product ( only admin )
+- DELETE/products : delete a product : soft delete ( only admin )
 
 ### Recommendation: 
 Run the project from your local machine by completing the initial setup cause on Render it takes time to load api.
