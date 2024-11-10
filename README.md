@@ -49,7 +49,7 @@ npm run start:dev
 ```
 
 ### Recommendation: 
-RUn the project from your local machine by completing the initial setup cause on Render it takes time to load api.
+Run the project from your local machine by completing the initial setup cause on Render it takes time to load api.
 ### Deployment:
 - **Backend**: Render
 
